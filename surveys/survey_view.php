@@ -53,9 +53,16 @@ if($mySurvey->isValid)
 	<p>'.$mySurvey->Description . '</p>';
 	$mySurvey->showQuestions();
     echo SurveyUtil::responseList($myID);
+	$myResult = new Result($myID);
+	if($myResult->isValid) {
+		echo '<h3 align="center">Behold, the tallied responses!</h3>';
+		$myResult->showGraph() . "<br />";	//showTallies method shows all questions, answers and tally totals!
+		unset($myResult);
+	}
+	//No "else" needed. If there's no responseList, then it'll say "No responses yet!" anyways.
 }else{
 	echo "Sorry, no such survey!";	
 }
-echo '<p><a href="index.php">Return to survey list</a></p>';	 
+echo '<p><a href="index.php">Back to survey list!</a></p>';
 get_footer(); #defaults to theme footer or footer_inc.php
 
