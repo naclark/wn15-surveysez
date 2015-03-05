@@ -31,37 +31,47 @@ if(isset($_GET['id']) && (int)$_GET['id'] > 0){#proper data must be on querystri
 }else{
 	myRedirect("./index.php");
 }
-$mySurvey = new Survey($myID);
-if($mySurvey->isValid)
+
+$myResult = new Result($myID);
+
+if($myResult->isValid) {
+	$config->titleTag = "Result of the survey '" .$myResult->Title . "'!";
+
+} 
+else 
 {
-	$config->titleTag = "A survey called '" .$mySurvey->Title . "'!";
-}else{//no such survey exists
-	$config->titleTag = "No such survey exists!";
+	$mySurvey = new Survey($myID);
+	if($mySurvey->isValid)
+	{
+			$config->titleTag = "A survey called '" .$mySurvey->Title . "'!";
+	}else{//no such survey exists
+			$config->titleTag = "No such survey exists!";
+	}
 }
-//dumpDie($mySurvey);
 
 get_header(); #defaults to theme header or header_inc.php
 
 echo '
 <h3 align="center">' . $config->titleTag . '</h3>
 	 ';
-
-if($mySurvey->isValid)
-{ #check to see if we have a valid SurveyID
-	echo 
-	'<p>Here is the Survey\'s description: </p>
-	<p>'.$mySurvey->Description . '</p>';
-	$mySurvey->showQuestions();
-    echo SurveyUtil::responseList($myID);
-	$myResult = new Result($myID);
-	if($myResult->isValid) {
-		echo '<h3 align="center">Behold, the tallied responses!</h3>';
-		$myResult->showGraph() . "<br />";	//showTallies method shows all questions, answers and tally totals!
-		unset($myResult);
+if($myResult->isValid) { 
+	echo '<h3 align="center">Behold, the tallied responses!</h3>';
+	echo '<p>Here is the description: </p>
+	<p>'.$myResult->Description . '</p>';	
+	$myResult->showGraph() . "<br />";	//showTallies method shows all questions, answers and tally totals!
+	unset($myResult);
+	echo SurveyUtil::responseList($myID);
+}
+else { 
+	if ($mySurvey->isValid)
+	{
+		echo 
+		'<p>Here is the Survey\'s description: </p>
+		<p>'.$mySurvey->Description . '</p>';
+		$mySurvey->showQuestions();
+	}else{
+		echo "Sorry, no such survey!";	
 	}
-	//No "else" needed. If there's no responseList, then it'll say "No responses yet!" anyways.
-}else{
-	echo "Sorry, no such survey!";	
 }
 echo '<p><a href="index.php">Back to survey list!</a></p>';
 get_footer(); #defaults to theme footer or footer_inc.php
